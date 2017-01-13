@@ -10,11 +10,14 @@ import android.media.SoundPool;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class DrumActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener {
 
@@ -154,7 +157,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                     sensorManager.unregisterListener(this);
                 }
             } else {
-                soundPool.play(soundId[classifier5NN()], 1.0F, 1.0F, 1, 0, 1.0F);
+                soundPool.play(soundId[classifierBykNN(5)], 1.0F, 1.0F, 1, 0, 1.0F);
 
 //                // Compare the latest log to the presets
 //                int minIndex = 0;
@@ -174,4 +177,23 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private int classifierBykNN(final int k) {
+        ArrayList<Pair<Double, Integer>> distances = new ArrayList<>();
+
+        for(int i=0 ; i<preDataSets.size() ; i++) {
+            distances.add(Pair.create(preDataSets.get(i).distance(accelDatas, orientDatas),
+                                      preDataSets.get(i).type));
+        }
+
+        Collections.sort(distances, new Comparator<Pair<Double, Integer>>() {
+            @Override
+            public int compare(Pair<Double, Integer> o1, Pair<Double, Integer> o2) {
+                return (int)(o2.first-o1.first);
+            }
+        });
+
+
+
+        return 0;
+    }
 }
