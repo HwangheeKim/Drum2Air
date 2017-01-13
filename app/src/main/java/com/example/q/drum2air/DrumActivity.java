@@ -138,7 +138,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
 
         if (x < -30) {
             swing = true;
-        } else if ((accelDatas.get(1).getX() < x) && swing) {
+        } else if (swing && (accelDatas.get(1).getX() < x)) {
             swing = false;
             Log.d("POWER!", accelDatas.get(0).toString());
 
@@ -152,8 +152,8 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                     sensorManager.unregisterListener(this);
                 }
             } else {
-                soundPool.play(soundId[classifierBykNN(7)], 1.0F, 1.0F, 1, 0, 1.0F);
-//                soundPool.play(soundId[classifierByMinDistance()], 1.0F, 1.0F, 1, 0, 1.0F);
+//                soundPool.play(soundId[classifierBykNN(7)], 1.0F, 1.0F, 1, 0, 1.0F);
+                soundPool.play(soundId[classifierByMinDistance()], 1.0F, 1.0F, 1, 0, 1.0F);
 
 //                // Compare the latest log to the presets
 //                int minIndex = 0;

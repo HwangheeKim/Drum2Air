@@ -19,14 +19,14 @@ public class PreDataSet {
         double distance = 0;
         for (int i = 0; i < PRESET_SIZE * 2; i++) {
             if (i < PRESET_SIZE) {
-                distance += Math.pow(angularDiff(orientHistory.get(i + OFFSET_SIZE).getAzimuth(), orientDatas.get(i).getAzimuth()), 2) * 20;
+                distance += Math.pow(angularDiff(orientHistory.get(i + OFFSET_SIZE).getAzimuth(), orientDatas.get(i).getAzimuth()), 2);
                 distance += Math.pow(angularDiff(orientHistory.get(i + OFFSET_SIZE).getPitch(), orientDatas.get(i).getPitch()), 2);
                 distance += Math.pow((orientHistory.get(i + OFFSET_SIZE).getRoll() - orientDatas.get(i).getRoll()), 2);
             }
 
-            distance += Math.pow((accelHistory.get(i + OFFSET_SIZE * 2).getX() - accelDatas.get(i).getX()), 2) * 196;
-            distance += Math.pow((accelHistory.get(i + OFFSET_SIZE * 2).getY() - accelDatas.get(i).getY()), 2) * 196;
-            distance += Math.pow((accelHistory.get(i + OFFSET_SIZE * 2).getZ() - accelDatas.get(i).getZ()), 2) * 196;
+            distance += Math.pow((accelHistory.get(i + OFFSET_SIZE * 2).getX() - accelDatas.get(i).getX()), 2);
+            distance += Math.pow((accelHistory.get(i + OFFSET_SIZE * 2).getY() - accelDatas.get(i).getY()), 2);
+            distance += Math.pow((accelHistory.get(i + OFFSET_SIZE * 2).getZ() - accelDatas.get(i).getZ()), 2);
         }
         return distance;
     }
