@@ -47,6 +47,6 @@ public class AccelData {
 
     @Override
     public String toString() {
-        return "t="+timestamp+", x="+x+", y="+y+", z="+z;
+        return "t = " + timestamp + ", x = " + x + ", y = " + y + ", z = " + z;
     }
 }
