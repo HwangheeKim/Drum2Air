@@ -21,11 +21,11 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
     TextView recordStatus;
     ArrayList<AccelData> accelDatas;
     ArrayList<OrientData> orientDatas;
-    ArrayList<PreDataSet> presets;
+    ArrayList<PreDataSet> preDataSets;
     SensorManager sensorManager;
     boolean started;
 
-    // snare, crash, hihat;
+    // snare, crash, hihat
     SoundPool[] soundPools = {null, null, null};
     int[] soundId = {0, 0, 0};
     int recording=-1, recordingType =-1;
@@ -38,7 +38,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         accelDatas = new ArrayList<>();
         orientDatas = new ArrayList<>();
-        presets = new ArrayList<>();
+        preDataSets = new ArrayList<>();
 
         recordSnare = (Button)findViewById(R.id.record_snare);
         recordCrash = (Button)findViewById(R.id.record_crash);
@@ -83,7 +83,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                 started = false;
                 accelDatas = new ArrayList();
                 orientDatas = new ArrayList();
-                presets = new ArrayList();
+                preDataSets = new ArrayList();
                 sensorManager.unregisterListener(this);
                 break;
             case R.id.record_snare:
@@ -134,7 +134,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
 
                 // If recording, set the preset
                 if(recording>=0) {
-                    presets.add(new PreDataSet(accelDatas, orientDatas, recordingType));
+                    preDataSets.add(new PreDataSet(accelDatas, orientDatas, recordingType));
                     recording++;
                     if(recording>=5) {
                         recording = -1;
@@ -146,8 +146,8 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                     // Compare the latest log to the presets
                     int minIndex = 0;
                     double minDistance = Double.MAX_VALUE;
-                    for(int i=0 ; i<presets.size() ; i++) {
-                        double distance = presets.get(i).distance(accelDatas, orientDatas);
+                    for(int i=0 ; i<preDataSets.size() ; i++) {
+                        double distance = preDataSets.get(i).distance(accelDatas, orientDatas);
                         if(distance < minDistance) {
                             minIndex = i;
                             minDistance = distance;
@@ -156,8 +156,8 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
 
                     // Find the best match
                     Log.d("Minimum Distance", "" + minDistance + " # Sound " + minIndex);
-                    soundPools[presets.get(minIndex).type].play(
-                            soundId[presets.get(minIndex).type], 1.0F, 1.0F, 1, 0, 1.0F);
+                    soundPools[preDataSets.get(minIndex).type].play(
+                            soundId[preDataSets.get(minIndex).type], 1.0F, 1.0F, 1, 0, 1.0F);
 
                 }
 
