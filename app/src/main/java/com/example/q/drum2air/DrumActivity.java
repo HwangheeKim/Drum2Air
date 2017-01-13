@@ -16,10 +16,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 public class DrumActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener {
 
@@ -154,8 +152,8 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                     sensorManager.unregisterListener(this);
                 }
             } else {
-//                soundPool.play(soundId[classifierBykNN(5)], 1.0F, 1.0F, 1, 0, 1.0F);
-                soundPool.play(soundId[classifierByMinDistance()], 1.0F, 1.0F, 1, 0, 1.0F);
+                soundPool.play(soundId[classifierBykNN(7)], 1.0F, 1.0F, 1, 0, 1.0F);
+//                soundPool.play(soundId[classifierByMinDistance()], 1.0F, 1.0F, 1, 0, 1.0F);
 
 //                // Compare the latest log to the presets
 //                int minIndex = 0;
@@ -191,6 +189,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         int[] count = {0, 0, 0};
+        count[distances.get(0).second]++;
         for(int i=0 ; i<k ; i++) {
             count[distances.get(i).second]++;
         }
