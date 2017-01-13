@@ -6,29 +6,11 @@ public class OrientData {
     private double pitch;
     private double roll;
 
-    public double getMA() {
-        return MA;
-    }
-
-    public void setMA(double MA) {
-        this.MA = MA;
-    }
-
-    private double MA;
-
     public OrientData(long timestamp, double azimuth, double pitch, double roll) {
         this.timestamp = timestamp;
         this.azimuth = azimuth;
         this.pitch = pitch;
         this.roll = roll;
-    }
-
-    public OrientData(long timestamp, double azimuth, double pitch, double roll, double MA) {
-        this.timestamp = timestamp;
-        this.azimuth = azimuth;
-        this.pitch = pitch;
-        this.roll = roll;
-        this.MA = MA;
     }
 
     public long getTimestamp() {

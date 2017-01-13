@@ -3,17 +3,17 @@ package com.example.q.drum2air;
 import java.util.ArrayList;
 
 public class PreDataSet {
-    public static int PRESET_SIZE = 50;
+    public static int PRESET_SIZE = 20;
     public static int OFFSET_SIZE = 0;
     ArrayList<AccelData> accelDatas;
     ArrayList<OrientData> orientDatas;
     int type;
 
     public PreDataSet(ArrayList<AccelData> accelHistory, ArrayList<OrientData> orientHistory, int type) {
-        accelDatas = new ArrayList<AccelData>
-                (accelHistory.subList(accelHistory.size()-1-PRESET_SIZE-OFFSET_SIZE, accelHistory.size()-1-OFFSET_SIZE));
-        orientDatas = new ArrayList<OrientData>
-                (orientHistory.subList(orientHistory.size()-1-PRESET_SIZE-OFFSET_SIZE, orientHistory.size()-1-OFFSET_SIZE));
+        accelDatas = new ArrayList<>
+                (accelHistory.subList(accelHistory.size() - 1 - (PRESET_SIZE * 2) - OFFSET_SIZE, accelHistory.size() - 1 - OFFSET_SIZE));
+        orientDatas = new ArrayList<>
+                (orientHistory.subList(orientHistory.size() - 1 - PRESET_SIZE - OFFSET_SIZE, orientHistory.size() - 1 - OFFSET_SIZE));
         this.type = type;
     }
 

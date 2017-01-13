@@ -31,11 +31,8 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
     SoundPool soundPool;
     int[] soundId = new int[3];
 
-    int recording=-1, recordingType =-1;
-
-    // snare, crash, hihat
-//    SoundPool[] soundPools = {null, null, null};
-//    int[] soundId = {0, 0, 0};
+    int recording = -1, recordingType = -1;
+    boolean swing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +123,6 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
-    boolean swing = false;
     @Override
     public void onSensorChanged(SensorEvent event) {
         if(event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
@@ -150,11 +146,10 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                 if(recording >= 5) {
                     recording = -1;
                     recordStatus.setText("RECORD DONE!");
-                    Log.d("RECORD DONE!!", "DOOOOOOOOOOOOOOONE!");
                     sensorManager.unregisterListener(this);
                 }
             } else {
-                soundPool.play(soundId[classifier5NN()], 1.0F, 1.0F, 1, 0, 1.0F);
+                soundPool.play(soundId[classifierByMinDistance()], 1.0F, 1.0F, 1, 0, 1.0F);
 
 //                // Compare the latest log to the presets
 //                int minIndex = 0;
@@ -172,6 +167,10 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
 //                soundPool.play(soundId[preDataSets.get(minIndex).type], 1.0F, 1.0F, 1, 0, 1.0F);
             }
         }
+    }
+
+    public int classifierByMinDistance() {
+        return 0;
     }
 
 }
