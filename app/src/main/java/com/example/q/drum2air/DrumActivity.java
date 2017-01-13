@@ -153,7 +153,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                 }
             } else {
                 soundPool.play(soundId[classifierBykNN(5)], 1.0F, 1.0F, 1, 0, 1.0F);
-                soundPool.play(soundId[classifierByMinDistance()], 1.0F, 1.0F, 1, 0, 1.0F);
+//                soundPool.play(soundId[classifierByMinDistance()], 1.0F, 1.0F, 1, 0, 1.0F);
 
 //                // Compare the latest log to the presets
 //                int minIndex = 0;
@@ -192,6 +192,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
 
         return 0;
     }
+
     public int classifierByMinDistance() {
         return 0;
     }
