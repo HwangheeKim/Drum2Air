@@ -16,8 +16,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 public class DrumActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener {
 
@@ -128,7 +130,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if(event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
+        if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
             orientDatas.add(0, new OrientData(System.currentTimeMillis(), event.values[0], event.values[1], event.values[2]));
             return;
         }
@@ -138,15 +140,15 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
 
         if (x < -30) {
             swing = true;
-        } else if ((accelDatas.get(accelDatas.size()-2).getX() < x) && swing) {
+        } else if ((accelDatas.get(1).getX() < x) && swing) {
             swing = false;
-            Log.d("POWER!", accelDatas.get(accelDatas.size()-1).toString());
+            Log.d("POWER!", accelDatas.get(0).toString());
 
             // If recording, set the preset
             if (recording >= 0) {
                 preDataSets.add(new PreDataSet(accelDatas, orientDatas, recordingType));
                 recording++;
-                if(recording >= 5) {
+                if (recording >= 5) {
                     recording = -1;
                     recordStatus.setText("RECORD DONE!");
                     sensorManager.unregisterListener(this);
@@ -184,7 +186,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         Collections.sort(distances, new Comparator<Pair<Double, Integer>>() {
             @Override
             public int compare(Pair<Double, Integer> o1, Pair<Double, Integer> o2) {
-                return (int)(o2.first-o1.first);
+                return (int)(o1.first-o2.first);
             }
         });
 
@@ -205,7 +207,17 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public int classifierByMinDistance() {
-        return 0;
+        ArrayList<Double> diff = new ArrayList<>();
+        diff.add((double) 0);
+        diff.add((double) 0);
+        diff.add((double) 0);
+        int type;
+        for (int i = 0; i < preDataSets.size(); i++) {
+            type = preDataSets.get(i).type;
+            diff.set(type, diff.get(type) + preDataSets.get(i).distance(accelDatas, orientDatas));
+        }
+        Log.d("DIFF", "0 : " + diff.get(0) + ", 1 : " + diff.get(1) + ", 2 : " + diff.get(2));
+        return diff.indexOf(Collections.min(diff));
     }
 
 }
