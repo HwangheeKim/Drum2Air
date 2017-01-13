@@ -33,7 +33,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.DrumActivity);
+        setContentView(R.layout.activity_drum);
 
         sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         accelDatas = new ArrayList<>();
