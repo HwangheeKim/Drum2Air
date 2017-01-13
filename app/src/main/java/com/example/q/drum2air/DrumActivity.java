@@ -129,12 +129,12 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onSensorChanged(SensorEvent event) {
         if(event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
-            orientDatas.add(new OrientData(System.currentTimeMillis(), event.values[0], event.values[1], event.values[2]));
+            orientDatas.add(0, new OrientData(System.currentTimeMillis(), event.values[0], event.values[1], event.values[2]));
             return;
         }
 
         double x = event.values[0];
-        accelDatas.add(new AccelData(System.currentTimeMillis(), event.values[0], event.values[1], event.values[2]));
+        accelDatas.add(0, new AccelData(System.currentTimeMillis(), event.values[0], event.values[1], event.values[2]));
 
         if (x < -30) {
             swing = true;
@@ -152,8 +152,8 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                     sensorManager.unregisterListener(this);
                 }
             } else {
-                soundPool.play(soundId[classifierBykNN(5)], 1.0F, 1.0F, 1, 0, 1.0F);
-//                soundPool.play(soundId[classifierByMinDistance()], 1.0F, 1.0F, 1, 0, 1.0F);
+//                soundPool.play(soundId[classifierBykNN(5)], 1.0F, 1.0F, 1, 0, 1.0F);
+                soundPool.play(soundId[classifierByMinDistance()], 1.0F, 1.0F, 1, 0, 1.0F);
 
 //                // Compare the latest log to the presets
 //                int minIndex = 0;
