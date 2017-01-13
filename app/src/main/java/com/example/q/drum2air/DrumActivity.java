@@ -17,28 +17,31 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 public class DrumActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener {
+
     Button recordSnare, recordCrash, recordHihat, startDrum, stopDrum;
     TextView recordStatus;
-    ArrayList<AccelData> accelDatas;
-    ArrayList<OrientData> orientDatas;
-    ArrayList<PreDataSet> preDataSets;
+
+    ArrayList<AccelData> accelDatas = new ArrayList<>();
+    ArrayList<OrientData> orientDatas = new ArrayList<>();
+    ArrayList<PreDataSet> preDataSets = new ArrayList<>();
+
     SensorManager sensorManager;
+    Sensor acceler, orientation;
+
+    SoundPool soundPool;
+    int[] soundId = new int[3];
+
     boolean started;
+    int recording=-1, recordingType =-1;
 
     // snare, crash, hihat
-    SoundPool[] soundPools = {null, null, null};
-    int[] soundId = {0, 0, 0};
-    int recording=-1, recordingType =-1;
+//    SoundPool[] soundPools = {null, null, null};
+//    int[] soundId = {0, 0, 0};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drum);
-
-        sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
-        accelDatas = new ArrayList<>();
-        orientDatas = new ArrayList<>();
-        preDataSets = new ArrayList<>();
 
         recordSnare = (Button)findViewById(R.id.record_snare);
         recordCrash = (Button)findViewById(R.id.record_crash);
@@ -47,25 +50,25 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         stopDrum = (Button)findViewById(R.id.stop_drum);
         recordStatus = (TextView)findViewById(R.id.record_status);
 
-        soundPools[0] = new SoundPool(1, AudioManager.STREAM_ALARM, 0);
-        soundId[0] = soundPools[0].load(this, R.raw.thud2, 1);
-        soundPools[1] = new SoundPool(1, AudioManager.STREAM_ALARM, 0);
-        soundId[1] = soundPools[1].load(this, R.raw.crash, 1);
-        soundPools[2] = new SoundPool(1, AudioManager.STREAM_ALARM, 0);
-        soundId[2] = soundPools[2].load(this, R.raw.hihat, 1);
-
         recordSnare.setOnClickListener(this);
         recordCrash.setOnClickListener(this);
         recordHihat.setOnClickListener(this);
         startDrum.setOnClickListener(this);
         stopDrum.setOnClickListener(this);
+
+        sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+        acceler = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        orientation = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+
+        soundPool = new SoundPool(3, AudioManager.STREAM_ALARM, 0);
+        soundId[0] = soundPool.load(this, R.raw.thud2, 1);
+        soundId[1] = soundPool.load(this, R.raw.crash, 1);
+        soundId[2] = soundPool.load(this, R.raw.hihat, 1);
     }
 
     private void initSensor() {
-        Sensor accel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        Sensor orient = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
-        sensorManager.registerListener(this, accel, SensorManager.SENSOR_DELAY_FASTEST);
-        sensorManager.registerListener(this, orient, SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(this, acceler, SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(this, orientation, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     @Override
@@ -107,6 +110,15 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 break;
         }
+    }
+
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(this);
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
     boolean swing = false;
@@ -156,17 +168,10 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
 
                     // Find the best match
                     Log.d("Minimum Distance", "" + minDistance + " # Sound " + minIndex);
-                    soundPools[preDataSets.get(minIndex).type].play(
-                            soundId[preDataSets.get(minIndex).type], 1.0F, 1.0F, 1, 0, 1.0F);
-
+                    soundPool.play(soundId[preDataSets.get(minIndex).type], 1.0F, 1.0F, 1, 0, 1.0F);
                 }
 
             }
         }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
     }
 }
