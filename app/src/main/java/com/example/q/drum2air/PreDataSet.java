@@ -19,9 +19,9 @@ public class PreDataSet {
 
     public double distance(ArrayList<AccelData> accelHistory, ArrayList<OrientData> orientHistory) {
         double distance = 0;
-        for(int i=0 ; i<PRESET_SIZE ; i++) {
-            distance += Math.pow((accelHistory.get(accelHistory.size()-1-i-OFFSET_SIZE).getX()
-                    -accelDatas.get(PRESET_SIZE-1-i).getX()),2);
+        for(int i = 0; i < PRESET_SIZE; i++) {
+            distance += Math.pow((accelHistory.get(accelHistory.size() - 1 - i - OFFSET_SIZE).getX()
+                    - accelDatas.get(PRESET_SIZE - 1 - i).getX()),2);
             distance += Math.pow((accelHistory.get(accelHistory.size()-1-i-OFFSET_SIZE).getY()
                     -accelDatas.get(PRESET_SIZE-1-i).getY()),2);
             distance += Math.pow((accelHistory.get(accelHistory.size()-1-i-OFFSET_SIZE).getZ()

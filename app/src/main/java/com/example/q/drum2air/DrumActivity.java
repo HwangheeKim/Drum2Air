@@ -59,7 +59,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         orientation = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
 
         soundPool = new SoundPool(3, AudioManager.STREAM_ALARM, 0);
-        soundId[0] = soundPool.load(this, R.raw.thud2, 1);
+        soundId[0] = soundPool.load(this, R.raw.snare, 1);
         soundId[1] = soundPool.load(this, R.raw.crash, 1);
         soundId[2] = soundPool.load(this, R.raw.hihat, 1);
     }
