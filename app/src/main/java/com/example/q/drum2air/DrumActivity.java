@@ -188,9 +188,20 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+        int[] count = {0, 0, 0};
+        for(int i=0 ; i<k ; i++) {
+            count[distances.get(i).second]++;
+        }
 
+        int maxCount = 0, maxIndex = 0;
+        for(int i=0 ; i<count.length ; i++) {
+            if(count[i] > maxCount) {
+                maxIndex = i;
+                maxCount = count[i];
+            }
+        }
 
-        return 0;
+        return maxIndex;
     }
 
     public int classifierByMinDistance() {
