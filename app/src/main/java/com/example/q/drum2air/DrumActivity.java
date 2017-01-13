@@ -31,7 +31,6 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
     SoundPool soundPool;
     int[] soundId = new int[3];
 
-    boolean started;
     int recording=-1, recordingType =-1;
 
     // snare, crash, hihat
@@ -56,6 +55,8 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         startDrum.setOnClickListener(this);
         stopDrum.setOnClickListener(this);
 
+        accelDatas.add(new AccelData(0, 0, 0, 0));
+
         sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         acceler = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         orientation = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
@@ -77,16 +78,15 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.start_drum:
                 startDrum.setEnabled(false);
                 stopDrum.setEnabled(true);
-                started = true;
                 initSensor();
                 break;
             case R.id.stop_drum:
                 startDrum.setEnabled(true);
                 stopDrum.setEnabled(false);
-                started = false;
-                accelDatas = new ArrayList();
-                orientDatas = new ArrayList();
-                preDataSets = new ArrayList();
+                accelDatas = new ArrayList<>();
+                accelDatas.add(new AccelData(0, 0, 0, 0));
+                orientDatas = new ArrayList<>();
+                preDataSets = new ArrayList<>();
                 sensorManager.unregisterListener(this);
                 break;
             case R.id.record_snare:
@@ -112,6 +112,11 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    protected void onResume() {
+        super.onResume();
+        initSensor();
+    }
+
     protected void onPause() {
         super.onPause();
         sensorManager.unregisterListener(this);
@@ -128,50 +133,45 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
             orientDatas.add(new OrientData(System.currentTimeMillis(), event.values[0], event.values[1], event.values[2]));
             return;
         }
+
         double x = event.values[0];
-        double y = event.values[1];
-        double z = event.values[2];
-        long timestamp = System.currentTimeMillis();
-        AccelData data = new AccelData(timestamp, x, y, z);
-        accelDatas.add(data);
+        accelDatas.add(new AccelData(System.currentTimeMillis(), event.values[0], event.values[1], event.values[2]));
 
-        if (started || recording>=0) {
-            if(x < -30) {
-                swing = true;
-            } else if(accelDatas.size()<2 || orientDatas.size()<2) {
+        if (x < -30) {
+            swing = true;
+        } else if ((accelDatas.get(accelDatas.size()-2).getX() < x) && swing) {
+            swing = false;
+            Log.d("POWER!", accelDatas.get(accelDatas.size()-1).toString());
 
-            } else if((accelDatas.get(accelDatas.size()-2).getX() < accelDatas.get(accelDatas.size()-1).getX()) && swing) {
-                swing = false;
-                Log.d("POWER!", accelDatas.get(accelDatas.size()-1).toString());
-
-                // If recording, set the preset
-                if(recording>=0) {
-                    preDataSets.add(new PreDataSet(accelDatas, orientDatas, recordingType));
-                    recording++;
-                    if(recording>=5) {
-                        recording = -1;
-                        recordStatus.setText("RECORD DONE!");
-                        Log.d("RECORD DONE!!", "DOOOOOOOOOOOOOOONE!");
-                        sensorManager.unregisterListener(this);
-                    }
-                } else {
-                    // Compare the latest log to the presets
-                    int minIndex = 0;
-                    double minDistance = Double.MAX_VALUE;
-                    for(int i=0 ; i<preDataSets.size() ; i++) {
-                        double distance = preDataSets.get(i).distance(accelDatas, orientDatas);
-                        if(distance < minDistance) {
-                            minIndex = i;
-                            minDistance = distance;
-                        }
-                    }
-
-                    // Find the best match
-                    Log.d("Minimum Distance", "" + minDistance + " # Sound " + minIndex);
-                    soundPool.play(soundId[preDataSets.get(minIndex).type], 1.0F, 1.0F, 1, 0, 1.0F);
+            // If recording, set the preset
+            if (recording >= 0) {
+                preDataSets.add(new PreDataSet(accelDatas, orientDatas, recordingType));
+                recording++;
+                if(recording >= 5) {
+                    recording = -1;
+                    recordStatus.setText("RECORD DONE!");
+                    Log.d("RECORD DONE!!", "DOOOOOOOOOOOOOOONE!");
+                    sensorManager.unregisterListener(this);
                 }
+            } else {
+                soundPool.play(soundId[classifier5NN()], 1.0F, 1.0F, 1, 0, 1.0F);
 
+//                // Compare the latest log to the presets
+//                int minIndex = 0;
+//                double minDistance = Double.MAX_VALUE;
+//                for(int i=0 ; i<preDataSets.size() ; i++) {
+//                    double distance = preDataSets.get(i).distance(accelDatas, orientDatas);
+//                    if(distance < minDistance) {
+//                        minIndex = i;
+//                        minDistance = distance;
+//                    }
+//                }
+//
+//                // Find the best match
+//                Log.d("Minimum Distance", "" + minDistance + " # Sound " + minIndex);
+//                soundPool.play(soundId[preDataSets.get(minIndex).type], 1.0F, 1.0F, 1, 0, 1.0F);
             }
         }
     }
+
 }
