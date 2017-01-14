@@ -41,7 +41,7 @@ public class Drum2Activity extends AppCompatActivity implements View.OnClickList
     boolean swing = false;
 
     double currentX = 0, currentY = 0, currentZ = 0, lastX = 0, lastY = 0, lastZ = 0;
-    int state = 0;
+    int state = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +82,7 @@ public class Drum2Activity extends AppCompatActivity implements View.OnClickList
         soundId[1] = soundPool.load(this, R.raw.crash, 1);
         soundId[2] = soundPool.load(this, R.raw.hihat, 1);
         soundId[3] = soundPool.load(this, R.raw.midtom, 1);
-        soundId[4] = soundPool.load(this, R.raw.tom, 1);
+        soundId[4] = soundPool.load(this, R.raw.floortom, 1);
     }
 
     private void initSensor() {
