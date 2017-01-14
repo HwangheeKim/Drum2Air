@@ -95,48 +95,48 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         int hMargin = 80;
         switch (state) {
             case 0:
-                if (lastZ + 80 < currentZ) {
-                    if(lastY - hMargin * 2 > currentY) return 1;
+                if (currentZ - lastZ > 80) {
+                    if (currentY - lastY < -(hMargin * 2)) return 1;
                     return 2;
                 }
-                if (lastY - hMargin * 2 > currentY) return 4;
-                if (lastY - hMargin > currentY) return 3;
+                if (currentY - lastY < -(hMargin * 2)) return 4;
+                if (currentY - lastY < -hMargin) return 3;
                 return 0;
 
             case 1:
-                if (lastZ - 80 > currentZ) {
-                    if(lastY + hMargin * 2 < currentY) return 0;
-                    if(lastY + hMargin < currentY) return 3;
+                if (currentZ - lastZ < -80) {
+                    if (currentY - lastY > hMargin * 2) return 0;
+                    if (currentY - lastY > hMargin) return 3;
                     return 4;
                 }
-                if (lastY + hMargin * 2 < currentY) return 2;
+                if (currentY - lastY > hMargin * 2) return 2;
                 return 1;
 
             case 2:
-                if (lastZ - 80 > currentZ) {
-                    if (lastY - hMargin * 2 > currentY) return 4;
-                    if (lastY - hMargin > currentY) return 3;
+                if (currentZ - lastZ < -80) {
+                    if (currentY - lastY < -(hMargin * 2)) return 4;
+                    if (currentY - lastY < -hMargin) return 3;
                     return 0;
                 }
-                if (lastY - hMargin * 2 > currentY) return 1;
+                if (currentY - lastY < -(hMargin * 2)) return 1;
                 return 2;
 
             case 3:
-                if (lastZ + 80 < currentZ) {
-                    if(lastY < currentY) return 2;
+                if (currentZ - lastZ > 80) {
+                    if (currentY - lastY > 0) return 2;
                     return 1;
                 }
-                if (lastY + hMargin < currentY) return 0;
-                if (lastY - hMargin > currentY) return 4;
+                if (currentY - lastY > hMargin) return 0;
+                if (currentY - lastY < -hMargin) return 4;
                 return 3;
 
             case 4:
-                if (lastZ + 80 < currentZ) {
-                    if(lastY + hMargin * 2 < currentY) return 2;
+                if (currentZ - lastZ > 80) {
+                    if (currentY - lastY > hMargin * 2) return 2;
                     return 1;
                 }
-                if (lastY + hMargin * 2 < currentY) return 0;
-                if (lastY + hMargin < currentY) return 3;
+                if (currentY - lastY > hMargin * 2) return 0;
+                if (currentY - lastY > hMargin) return 3;
                 return 4;
 
             default:
