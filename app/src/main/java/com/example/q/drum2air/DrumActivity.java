@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 public class DrumActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener{
 
-    Button button_hihat, button_snare, button_midtom, button_crash, button_floortom, button_bass;
+    Button button_hihat, button_snare, button_midtom, button_crash, button_floortom, button_bass, button_hand;
 
     SensorManager sensorManager;
     Sensor sensorGyroscope;
@@ -29,6 +29,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
     int state = 3;
     boolean first = true;
     boolean swing = false;
+    boolean rightHanded = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +45,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         button_crash = (Button) findViewById(R.id.button_crash);
         button_floortom = (Button) findViewById(R.id.button_floortom);
         button_bass = (Button) findViewById(R.id.button_bass);
+        button_hand = (Button) findViewById(R.id.button_hand);
 
         button_hihat.setOnClickListener(this);
         button_snare.setOnClickListener(this);
@@ -51,6 +53,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         button_crash.setOnClickListener(this);
         button_floortom.setOnClickListener(this);
         button_bass.setOnClickListener(this);
+        button_hand.setOnClickListener(this);
 
         sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         sensorGyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
@@ -91,6 +94,14 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                 soundPool.play(soundId[5], 1.0F, 1.0F, 1, 0, 1.0F);
                 Toast.makeText(this, "BASS!", Toast.LENGTH_SHORT).show();
                 break;
+            case R.id.button_hand:
+                if (rightHanded) {
+                    button_hand.setText("To right-handed mode");
+                    rightHanded = false;
+                } else {
+                    button_hand.setText("To left-handed mode");
+                    rightHanded = true;
+                }
             default:
                 break;
         }
@@ -120,25 +131,95 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         currentY += event.values[1];
         currentZ += event.values[2];
 
-        if (event.values[2] < -5) {
-            swing = true;
-        } else if (swing && prevZ < event.values[2]) {
-            swing = false;
-            if (!first) {
-                state = newState();
-            } else {
-                first = false;
+        if (rightHanded) {
+            if (event.values[2] > 5) {
+                swing = true;
+            } else if (swing && prevZ > event.values[2]) {
+                swing = false;
+                if (!first) {
+                    state = newStateR();
+                } else {
+                    first = false;
+                }
+                soundPool.play(soundId[state], 1.0F, 1.0F, 1, 0, 1.0F);
+                lastX = currentX;
+                lastY = currentY;
+                lastZ = currentZ;
             }
-            soundPool.play(soundId[state], 1.0F, 1.0F, 1, 0, 1.0F);
-            lastX = currentX;
-            lastY = currentY;
-            lastZ = currentZ;
+            prevZ = event.values[2];
+        } else {
+            if (event.values[2] < -5) {
+                swing = true;
+            } else if (swing && prevZ < event.values[2]) {
+                swing = false;
+                if (!first) {
+                    state = newStateL();
+                } else {
+                    first = false;
+                }
+                soundPool.play(soundId[state], 1.0F, 1.0F, 1, 0, 1.0F);
+                lastX = currentX;
+                lastY = currentY;
+                lastZ = currentZ;
+            }
+            prevZ = event.values[2];
         }
-
-        prevZ = event.values[2];
     }
 
-    private int newState() {
+    private int newStateR() {
+        int hMargin = 80;
+        switch (state) {
+            case 4:
+                if (currentZ - lastZ < -80) {
+                    if (currentY - lastY > hMargin * 2) return 2;
+                    return 1;
+                }
+                if (currentY - lastY > hMargin * 2) return 0;
+                if (currentY - lastY > hMargin) return 3;
+                return 4;
+
+            case 2:
+                if (currentZ - lastZ > 80) {
+                    if (currentY - lastY < -(hMargin * 2)) return 4;
+                    if (currentY - lastY < -hMargin) return 3;
+                    return 0;
+                }
+                if (currentY - lastY < -(hMargin * 2)) return 1;
+                return 2;
+
+            case 1:
+                if (currentZ - lastZ > 80) {
+                    if (currentY - lastY > hMargin * 2) return 0;
+                    if (currentY - lastY > hMargin) return 3;
+                    return 4;
+                }
+                if (currentY - lastY > hMargin * 2) return 2;
+                return 1;
+
+            case 3:
+                if (currentZ - lastZ < -80) {
+                    if (currentY - lastY < 0) return 1;
+                    return 2;
+                }
+                if (currentY - lastY < -hMargin) return 4;
+                if (currentY - lastY > hMargin) return 0;
+                return 3;
+
+            case 0:
+                if (currentZ - lastZ < -80) {
+                    if (currentY - lastY < -(hMargin * 2)) return 1;
+                    return 2;
+                }
+                if (currentY - lastY < -(hMargin * 2)) return 4;
+                if (currentY - lastY < -hMargin) return 3;
+                return 0;
+
+            default:
+                return state;
+        }
+    }
+
+    private int newStateL() {
         int hMargin = 80;
         switch (state) {
             case 0:
