@@ -9,107 +9,48 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.util.Pair;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import android.view.Window;
+import android.view.WindowManager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-
-public class DrumActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener {
-
-    Button recordSnare, recordCrash, recordHihat, startDrum, stopDrum;
-    TextView recordStatus;
-
-    ArrayList<AccelData> accelDatas = new ArrayList<>();
-    ArrayList<OrientData> orientDatas = new ArrayList<>();
-    ArrayList<PreDataSet> preDataSets = new ArrayList<>();
+public class DrumActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener{
 
     SensorManager sensorManager;
-    Sensor acceler, orientation;
+    Sensor sensorGyroscope;
 
     SoundPool soundPool;
-    int[] soundId = new int[3];
+    int[] soundId = new int[5];
 
-    int recording = -1, recordingType = -1;
+    double currentX = 0, currentY = 0, currentZ = 0, lastX = 0, lastY = 0, lastZ = 0, prevZ = 0;
+    int state = 3;
+    boolean first = true;
     boolean swing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_drum);
 
-        recordSnare = (Button)findViewById(R.id.record_snare);
-        recordCrash = (Button)findViewById(R.id.record_crash);
-        recordHihat = (Button)findViewById(R.id.record_hihat);
-        startDrum = (Button)findViewById(R.id.start_drum);
-        stopDrum = (Button)findViewById(R.id.stop_drum);
-        recordStatus = (TextView)findViewById(R.id.record_status);
-
-        recordSnare.setOnClickListener(this);
-        recordCrash.setOnClickListener(this);
-        recordHihat.setOnClickListener(this);
-        startDrum.setOnClickListener(this);
-        stopDrum.setOnClickListener(this);
-
-        accelDatas.add(new AccelData(0, 0, 0, 0));
-
         sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
-        acceler = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        orientation = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+        sensorGyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
-        soundPool = new SoundPool(3, AudioManager.STREAM_ALARM, 0);
+        soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
         soundId[0] = soundPool.load(this, R.raw.snare, 1);
         soundId[1] = soundPool.load(this, R.raw.crash, 1);
         soundId[2] = soundPool.load(this, R.raw.hihat, 1);
-    }
-
-    private void initSensor() {
-        sensorManager.registerListener(this, acceler, SensorManager.SENSOR_DELAY_FASTEST);
-        sensorManager.registerListener(this, orientation, SensorManager.SENSOR_DELAY_FASTEST);
+        soundId[3] = soundPool.load(this, R.raw.midtom, 1);
+        soundId[4] = soundPool.load(this, R.raw.floortom, 1);
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.start_drum:
-                startDrum.setEnabled(false);
-                stopDrum.setEnabled(true);
-                initSensor();
-                break;
-            case R.id.stop_drum:
-                startDrum.setEnabled(true);
-                stopDrum.setEnabled(false);
-                accelDatas = new ArrayList<>();
-                accelDatas.add(new AccelData(0, 0, 0, 0));
-                orientDatas = new ArrayList<>();
-                preDataSets = new ArrayList<>();
-                sensorManager.unregisterListener(this);
-                break;
-            case R.id.record_snare:
-                recording = 0;
-                recordingType = 0;
-                recordStatus.setText("Snare Recording");
-                initSensor();
-                break;
-            case R.id.record_crash:
-                recording = 0;
-                recordingType = 1;
-                recordStatus.setText("Crash Recording");
-                initSensor();
-                break;
-            case R.id.record_hihat:
-                recording = 0;
-                recordingType = 2;
-                recordStatus.setText("Hihat Recording");
-                initSensor();
-                break;
-            default:
-                break;
-        }
+    }
+
+    private void initSensor() {
+        sensorManager.registerListener(this, sensorGyroscope, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     protected void onResume() {
@@ -128,95 +69,79 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
-            orientDatas.add(0, new OrientData(System.currentTimeMillis(), event.values[0], event.values[1], event.values[2]));
-            return;
-        }
+        currentX += event.values[0];
+        currentY += event.values[1];
+        currentZ += event.values[2];
 
-        double x = event.values[0];
-        accelDatas.add(0, new AccelData(System.currentTimeMillis(), event.values[0], event.values[1], event.values[2]));
-
-        if (x < -30) {
+        if (event.values[2] < -5) {
             swing = true;
-        } else if (swing && (accelDatas.get(1).getX() < x)) {
+        } else if (swing && prevZ < event.values[2]) {
             swing = false;
-            Log.d("POWER!", accelDatas.get(0).toString());
-
-            // If recording, set the preset
-            if (recording >= 0) {
-                preDataSets.add(new PreDataSet(accelDatas, orientDatas, recordingType));
-                recording++;
-                if (recording >= 5) {
-                    recording = -1;
-                    recordStatus.setText("RECORD DONE!");
-                    sensorManager.unregisterListener(this);
-                }
+            if (!first) {
+                state = newState();
             } else {
-//                soundPool.play(soundId[classifierBykNN(7)], 1.0F, 1.0F, 1, 0, 1.0F);
-                soundPool.play(soundId[classifierByMinDistance()], 1.0F, 1.0F, 1, 0, 1.0F);
-
-//                // Compare the latest log to the presets
-//                int minIndex = 0;
-//                double minDistance = Double.MAX_VALUE;
-//                for(int i=0 ; i<preDataSets.size() ; i++) {
-//                    double distance = preDataSets.get(i).distance(accelDatas, orientDatas);
-//                    if(distance < minDistance) {
-//                        minIndex = i;
-//                        minDistance = distance;
-//                    }
-//                }
-//
-//                // Find the best match
-//                Log.d("Minimum Distance", "" + minDistance + " # Sound " + minIndex);
-//                soundPool.play(soundId[preDataSets.get(minIndex).type], 1.0F, 1.0F, 1, 0, 1.0F);
+                first = false;
             }
+            soundPool.play(soundId[state], 1.0F, 1.0F, 1, 0, 1.0F);
+            lastX = currentX;
+            lastY = currentY;
+            lastZ = currentZ;
         }
+
+        prevZ = event.values[2];
     }
 
-    private int classifierBykNN(final int k) {
-        ArrayList<Pair<Double, Integer>> distances = new ArrayList<>();
+    private int newState() {
+        int hMargin = 80;
+        switch (state) {
+            case 0:
+                if (lastZ + 80 < currentZ) {
+                    if(lastY - hMargin * 2 > currentY) return 1;
+                    return 2;
+                }
+                if (lastY - hMargin * 2 > currentY) return 4;
+                if (lastY - hMargin > currentY) return 3;
+                return 0;
 
-        for(int i=0 ; i<preDataSets.size() ; i++) {
-            distances.add(Pair.create(preDataSets.get(i).distance(accelDatas, orientDatas),
-                                      preDataSets.get(i).type));
+            case 1:
+                if (lastZ - 80 > currentZ) {
+                    if(lastY + hMargin * 2 < currentY) return 0;
+                    if(lastY + hMargin < currentY) return 3;
+                    return 4;
+                }
+                if (lastY + hMargin * 2 < currentY) return 2;
+                return 1;
+
+            case 2:
+                if (lastZ - 80 > currentZ) {
+                    if (lastY - hMargin * 2 > currentY) return 4;
+                    if (lastY - hMargin > currentY) return 3;
+                    return 0;
+                }
+                if (lastY - hMargin * 2 > currentY) return 1;
+                return 2;
+
+            case 3:
+                if (lastZ + 80 < currentZ) {
+                    if(lastY < currentY) return 2;
+                    return 1;
+                }
+                if (lastY + hMargin < currentY) return 0;
+                if (lastY - hMargin > currentY) return 4;
+                return 3;
+
+            case 4:
+                if (lastZ + 80 < currentZ) {
+                    if(lastY + hMargin * 2 < currentY) return 2;
+                    return 1;
+                }
+                if (lastY + hMargin * 2 < currentY) return 0;
+                if (lastY + hMargin < currentY) return 3;
+                return 4;
+
+            default:
+                return state;
         }
-
-        Collections.sort(distances, new Comparator<Pair<Double, Integer>>() {
-            @Override
-            public int compare(Pair<Double, Integer> o1, Pair<Double, Integer> o2) {
-                return (int)(o1.first-o2.first);
-            }
-        });
-
-        int[] count = {0, 0, 0};
-        count[distances.get(0).second]++;
-        for(int i=0 ; i<k ; i++) {
-            count[distances.get(i).second]++;
-        }
-
-        int maxCount = 0, maxIndex = 0;
-        for(int i=0 ; i<count.length ; i++) {
-            if(count[i] > maxCount) {
-                maxIndex = i;
-                maxCount = count[i];
-            }
-        }
-
-        return maxIndex;
-    }
-
-    public int classifierByMinDistance() {
-        ArrayList<Double> diff = new ArrayList<>();
-        diff.add((double) 0);
-        diff.add((double) 0);
-        diff.add((double) 0);
-        int type;
-        for (int i = 0; i < preDataSets.size(); i++) {
-            type = preDataSets.get(i).type;
-            diff.set(type, diff.get(type) + preDataSets.get(i).distance(accelDatas, orientDatas));
-        }
-        Log.d("DIFF", "0 : " + diff.get(0) + ", 1 : " + diff.get(1) + ", 2 : " + diff.get(2));
-        return diff.indexOf(Collections.min(diff));
     }
 
 }

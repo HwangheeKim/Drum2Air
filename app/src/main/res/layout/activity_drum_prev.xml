@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_drum"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context="com.example.q.drum2air.DrumActivity_prev2">
+
+    <Button
+        android:id="@+id/record_snare"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text = "Record Snare"/>
+
+    <Button
+        android:id="@+id/record_crash"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text = "Record Crash"/>
+
+    <Button
+        android:id="@+id/record_hihat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Record Hihat"/>
+
+    <Button
+        android:id="@+id/start_drum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Drumming"/>
+
+    <Button
+        android:id="@+id/stop_drum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Stop Drumming"/>
+
+    <TextView
+        android:id="@+id/record_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Waiting..."/>
+
+    <Button
+        android:id="@+id/sound_snare"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="snare (0)"/>
+
+    <Button
+        android:id="@+id/sound_midtom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="midtom (3)"/>
+
+    <Button
+        android:id="@+id/sound_tom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="tom (4)"/>
+
+</LinearLayout>

@@ -27,7 +27,7 @@ public class SplashScreen extends AppCompatActivity {
 //                } catch(InterruptedException e) {
 //                    e.printStackTrace();
 //                } finally {
-//                    Intent intent = new Intent(getApplicationContext(), Drum2Activity.class);
+//                    Intent intent = new Intent(getApplicationContext(), DrumActivity.class);
 //                    startActivity(intent);
 //                }
 //            }
@@ -38,7 +38,7 @@ public class SplashScreen extends AppCompatActivity {
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Intent intent = new Intent(getApplicationContext(), Drum2Activity.class);
+                Intent intent = new Intent(getApplicationContext(), DrumActivity.class);
                 startActivity(intent);
                 return true;
             }
