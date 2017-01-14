@@ -1,19 +1,34 @@
 package com.example.q.drum2air;
 
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.felhr.usbserial.UsbSerialDevice;
+import com.felhr.usbserial.UsbSerialInterface;
+
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DrumActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener{
 
@@ -30,6 +45,13 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
     boolean first = true;
     boolean swing = false;
     boolean rightHanded = true;
+
+    private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
+    UsbManager usbManager;
+    UsbDeviceConnection connection;
+    UsbDevice device;
+    UsbSerialDevice serialPort;
+    UsbSerialInterface.UsbReadCallback mCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +87,77 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         soundId[3] = soundPool.load(this, R.raw.midtom, 1);
         soundId[4] = soundPool.load(this, R.raw.floortom, 1);
         soundId[5] = soundPool.load(this, R.raw.bass, 1);
+
+        usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+        registerReceiver(broadcastReceiver, filter);
+        mCallback = new UsbSerialInterface.UsbReadCallback() {
+            @Override
+            public void onReceivedData(byte[] bytes) {
+                if (bytes != null && bytes.length > 0 && bytes[0] == 'T') {
+                    soundPool.play(soundId[5], 1.0F, 1.0F, 1, 0, 1.0F);
+                }
+            }
+        };
     }
+
+    private void connectDevice() {
+        HashMap usbDevices = usbManager.getDeviceList();
+        if ( !usbDevices.isEmpty() ) {
+            boolean keep = true;
+            for (Object entry : usbDevices.entrySet()) {
+                device = (UsbDevice)((Map.Entry)entry).getValue();
+                int deviceVID = device.getVendorId();
+                if (deviceVID == 0x2A03) {
+                    PendingIntent pi = PendingIntent.getBroadcast(DrumActivity.this, 0,
+                            new Intent(ACTION_USB_PERMISSION), 0);
+                    usbManager.requestPermission(device, pi);
+                    keep = false;
+                } else {
+                    connection = null;
+                    device = null;
+                }
+                if (!keep)
+                    break;
+            }
+        }
+    }
+
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(ACTION_USB_PERMISSION)) {
+                boolean granted =
+                        intent.getExtras().getBoolean(UsbManager.EXTRA_PERMISSION_GRANTED);
+                if (granted) {
+                    connection = usbManager.openDevice(device);
+                    serialPort = UsbSerialDevice.createUsbSerialDevice(device, connection);
+                    if (serialPort != null) {
+                        if (serialPort.open()) { //Set Serial Connection Parameters.
+//                            setUiEnabled(true); //Enable Buttons in UI
+                            serialPort.setBaudRate(9600);
+                            serialPort.setDataBits(UsbSerialInterface.DATA_BITS_8);
+                            serialPort.setStopBits(UsbSerialInterface.STOP_BITS_1);
+                            serialPort.setParity(UsbSerialInterface.PARITY_NONE);
+                            serialPort.setFlowControl(UsbSerialInterface.FLOW_CONTROL_OFF);
+                            serialPort.read(mCallback); //
+
+                        } else {
+                            Log.d("SERIAL", "PORT NOT OPEN");
+                        }
+                    } else {
+                        Log.d("SERIAL", "PORT IS NULL");
+                    }
+                } else {
+                    Log.d("SERIAL", "PERM NOT GRANTED");
+                }
+            } else if (intent.getAction().equals(UsbManager.ACTION_USB_DEVICE_ATTACHED)) {
+                connectDevice();
+            } else if (intent.getAction().equals(UsbManager.ACTION_USB_DEVICE_DETACHED)) {
+                serialPort.close();
+            }
+        }
+    };
 
     @Override
     public void onClick(View v) {
@@ -93,6 +185,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.button_bass:
                 soundPool.play(soundId[5], 1.0F, 1.0F, 1, 0, 1.0F);
                 Toast.makeText(this, "BASS!", Toast.LENGTH_SHORT).show();
+                connectDevice();
                 break;
             case R.id.button_hand:
                 if (rightHanded) {
