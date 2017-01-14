@@ -9,6 +9,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
+    android:background="@color/colorBackground"
     tools:context="com.example.q.drum2air.DrumActivity">
 
     <FrameLayout
@@ -16,6 +17,62 @@
         android:layout_height="wrap_content"
         android:background="@drawable/drumset">
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:id="@+id/button_hihat"
+            android:background="@android:color/transparent"
+            android:layout_marginTop="77dp"
+            android:layout_marginLeft="23dp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:id="@+id/button_snare"
+            android:background="@android:color/transparent"
+            android:layout_marginTop="110dp"
+            android:layout_marginLeft="97dp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="47dp"
+            android:id="@+id/button_midtom"
+            android:background="@android:color/transparent"
+            android:layout_marginTop="63dp"
+            android:layout_marginLeft="150dp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:id="@+id/button_crash"
+            android:background="@android:color/transparent"
+            android:layout_marginTop="12dp"
+            android:layout_marginLeft="240dp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="53dp"
+            android:id="@+id/button_floortom"
+            android:background="@android:color/transparent"
+            android:layout_marginTop="114dp"
+            android:layout_marginLeft="241dp"/>
+
     </FrameLayout>
+
+    <TextView
+        android:text="At the first time,\nhit the middle tom plz."
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+        android:textSize="20dp"
+        android:gravity="center"
+        android:layout_marginTop="20dp"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo"
+        android:layout_gravity="center"
+        android:layout_marginTop="130dp"/>
 
 </LinearLayout>

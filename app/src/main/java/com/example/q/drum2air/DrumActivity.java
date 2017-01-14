@@ -12,8 +12,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.Toast;
 
 public class DrumActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener{
+
+    Button button_hihat, button_snare, button_midtom, button_crash, button_floortom;
 
     SensorManager sensorManager;
     Sensor sensorGyroscope;
@@ -34,6 +38,18 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_drum);
 
+        button_hihat = (Button) findViewById(R.id.button_hihat);
+        button_snare = (Button) findViewById(R.id.button_snare);
+        button_midtom = (Button) findViewById(R.id.button_midtom);
+        button_crash = (Button) findViewById(R.id.button_crash);
+        button_floortom = (Button) findViewById(R.id.button_floortom);
+
+        button_hihat.setOnClickListener(this);
+        button_snare.setOnClickListener(this);
+        button_midtom.setOnClickListener(this);
+        button_crash.setOnClickListener(this);
+        button_floortom.setOnClickListener(this);
+
         sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         sensorGyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
@@ -47,6 +63,30 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.button_snare:
+                soundPool.play(soundId[0], 1.0F, 1.0F, 1, 0, 1.0F);
+                Toast.makeText(this, "SNARE!", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.button_crash:
+                soundPool.play(soundId[1], 1.0F, 1.0F, 1, 0, 1.0F);
+                Toast.makeText(this, "CRASH!", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.button_hihat:
+                soundPool.play(soundId[2], 1.0F, 1.0F, 1, 0, 1.0F);
+                Toast.makeText(this, "HI HAT!", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.button_midtom:
+                soundPool.play(soundId[3], 1.0F, 1.0F, 1, 0, 1.0F);
+                Toast.makeText(this, "MIDDLE TOM!", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.button_floortom:
+                soundPool.play(soundId[4], 1.0F, 1.0F, 1, 0, 1.0F);
+                Toast.makeText(this, "FLOOR TOM!", Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                break;
+        }
     }
 
     private void initSensor() {
