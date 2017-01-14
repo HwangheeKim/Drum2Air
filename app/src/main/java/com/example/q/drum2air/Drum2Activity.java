@@ -22,6 +22,7 @@ import java.util.Comparator;
 public class Drum2Activity extends AppCompatActivity implements View.OnClickListener, SensorEventListener {
 
     Button recordSnare, recordCrash, recordHihat, startDrum, stopDrum;
+    Button soundSnare, soundMidtom, soundTom;
     TextView recordStatus;
 
     ArrayList<AccelData> accelDatas = new ArrayList<>();
@@ -32,7 +33,7 @@ public class Drum2Activity extends AppCompatActivity implements View.OnClickList
     Sensor acceler, orientation, gyroscope;
 
     SoundPool soundPool;
-    int[] soundId = new int[3];
+    int[] soundId = new int[5];
 
     int recording = -1, recordingType = -1;
     boolean swing = false;
@@ -45,18 +46,24 @@ public class Drum2Activity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drum);
 
-        recordSnare = (Button)findViewById(R.id.record_snare);
-        recordCrash = (Button)findViewById(R.id.record_crash);
-        recordHihat = (Button)findViewById(R.id.record_hihat);
-        startDrum = (Button)findViewById(R.id.start_drum);
-        stopDrum = (Button)findViewById(R.id.stop_drum);
-        recordStatus = (TextView)findViewById(R.id.record_status);
+        recordSnare = (Button) findViewById(R.id.record_snare);
+        recordCrash = (Button) findViewById(R.id.record_crash);
+        recordHihat = (Button) findViewById(R.id.record_hihat);
+        startDrum = (Button) findViewById(R.id.start_drum);
+        stopDrum = (Button) findViewById(R.id.stop_drum);
+        recordStatus = (TextView) findViewById(R.id.record_status);
+        soundSnare = (Button) findViewById(R.id.sound_snare);
+        soundMidtom = (Button) findViewById(R.id.sound_midtom);
+        soundTom = (Button) findViewById(R.id.sound_tom);
 
         recordSnare.setOnClickListener(this);
         recordCrash.setOnClickListener(this);
         recordHihat.setOnClickListener(this);
         startDrum.setOnClickListener(this);
         stopDrum.setOnClickListener(this);
+        soundSnare.setOnClickListener(this);
+        soundMidtom.setOnClickListener(this);
+        soundTom.setOnClickListener(this);
 
         accelDatas.add(new AccelData(0, 0, 0, 0));
 
@@ -65,10 +72,12 @@ public class Drum2Activity extends AppCompatActivity implements View.OnClickList
         orientation = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
         gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
-        soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
+        soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
         soundId[0] = soundPool.load(this, R.raw.snare, 1);
         soundId[1] = soundPool.load(this, R.raw.crash, 1);
         soundId[2] = soundPool.load(this, R.raw.hihat, 1);
+        soundId[3] = soundPool.load(this, R.raw.midtom, 1);
+        soundId[4] = soundPool.load(this, R.raw.tom, 1);
     }
 
     private void initSensor() {
@@ -119,6 +128,18 @@ public class Drum2Activity extends AppCompatActivity implements View.OnClickList
                 recordingType = 2;
                 recordStatus.setText("Hihat Recording");
                 initSensor();
+                break;
+            case R.id.sound_snare:
+                Log.d("SNARE", "SNARE!!!!!!!!!!!!!!!!!!!!!!!!!");
+                soundPool.play(soundId[0], 1.0F, 1.0F, 1, 0, 1.0F);
+                break;
+            case R.id.sound_midtom:
+                Log.d("MIDTOM", "MIDTOM!!!!!!!!!!!!!!!!!!!!!!!!!");
+                soundPool.play(soundId[3], 1.0F, 1.0F, 1, 0, 1.0F);
+                break;
+            case R.id.sound_tom:
+                Log.d("TOM", "TOM!!!!!!!!!!!!!!!!!!!!!!!!!");
+                soundPool.play(soundId[4], 1.0F, 1.0F, 1, 0, 1.0F);
                 break;
             default:
                 break;

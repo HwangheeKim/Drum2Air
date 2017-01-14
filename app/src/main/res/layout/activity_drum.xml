@@ -47,4 +47,22 @@
         android:layout_height="wrap_content"
         android:text="Waiting..."/>
 
+    <Button
+        android:id="@+id/sound_snare"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="snare (0)"/>
+
+    <Button
+        android:id="@+id/sound_midtom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="midtom (3)"/>
+
+    <Button
+        android:id="@+id/sound_tom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="tom (4)"/>
+
 </LinearLayout>
