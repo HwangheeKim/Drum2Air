@@ -17,13 +17,13 @@ import android.widget.Toast;
 
 public class DrumActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener{
 
-    Button button_hihat, button_snare, button_midtom, button_crash, button_floortom;
+    Button button_hihat, button_snare, button_midtom, button_crash, button_floortom, button_bass;
 
     SensorManager sensorManager;
     Sensor sensorGyroscope;
 
     SoundPool soundPool;
-    int[] soundId = new int[5];
+    int[] soundId = new int[6];
 
     double currentX = 0, currentY = 0, currentZ = 0, lastX = 0, lastY = 0, lastZ = 0, prevZ = 0;
     int state = 3;
@@ -43,22 +43,25 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         button_midtom = (Button) findViewById(R.id.button_midtom);
         button_crash = (Button) findViewById(R.id.button_crash);
         button_floortom = (Button) findViewById(R.id.button_floortom);
+        button_bass = (Button) findViewById(R.id.button_bass);
 
         button_hihat.setOnClickListener(this);
         button_snare.setOnClickListener(this);
         button_midtom.setOnClickListener(this);
         button_crash.setOnClickListener(this);
         button_floortom.setOnClickListener(this);
+        button_bass.setOnClickListener(this);
 
         sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         sensorGyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
-        soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        soundPool = new SoundPool(6, AudioManager.STREAM_MUSIC, 0);
         soundId[0] = soundPool.load(this, R.raw.snare, 1);
         soundId[1] = soundPool.load(this, R.raw.crash, 1);
         soundId[2] = soundPool.load(this, R.raw.hihat, 1);
         soundId[3] = soundPool.load(this, R.raw.midtom, 1);
         soundId[4] = soundPool.load(this, R.raw.floortom, 1);
+        soundId[5] = soundPool.load(this, R.raw.bass, 1);
     }
 
     @Override
@@ -83,6 +86,10 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.button_floortom:
                 soundPool.play(soundId[4], 1.0F, 1.0F, 1, 0, 1.0F);
                 Toast.makeText(this, "FLOOR TOM!", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.button_bass:
+                soundPool.play(soundId[5], 1.0F, 1.0F, 1, 0, 1.0F);
+                Toast.makeText(this, "BASS!", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
