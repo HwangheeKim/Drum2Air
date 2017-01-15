@@ -89,8 +89,6 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         soundId[5] = soundPool.load(this, R.raw.bass, 1);
 
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
-        registerReceiver(broadcastReceiver, filter);
         mCallback = new UsbSerialInterface.UsbReadCallback() {
             @Override
             public void onReceivedData(byte[] bytes) {
@@ -112,6 +110,8 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                     PendingIntent pi = PendingIntent.getBroadcast(DrumActivity.this, 0,
                             new Intent(ACTION_USB_PERMISSION), 0);
                     usbManager.requestPermission(device, pi);
+                    IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+                    registerReceiver(broadcastReceiver, filter);
                     keep = false;
                 } else {
                     connection = null;
