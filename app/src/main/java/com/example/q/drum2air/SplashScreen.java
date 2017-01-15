@@ -10,6 +10,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 public class SplashScreen extends AppCompatActivity {
+    boolean drumActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +20,7 @@ public class SplashScreen extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.splash);
+        drumActivity = false;
 
         Thread timerThread = new Thread() {
             public void run(){
@@ -27,8 +29,10 @@ public class SplashScreen extends AppCompatActivity {
                 } catch(InterruptedException e) {
                     e.printStackTrace();
                 } finally {
-                    Intent intent = new Intent(getApplicationContext(), DrumActivity.class);
-                    startActivity(intent);
+                    if (!drumActivity) {
+                        Intent intent = new Intent(getApplicationContext(), DrumActivity.class);
+                        startActivity(intent);
+                    }
                 }
             }
         };
@@ -40,6 +44,7 @@ public class SplashScreen extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 Intent intent = new Intent(getApplicationContext(), DrumActivity.class);
                 startActivity(intent);
+                drumActivity = true;
                 return true;
             }
         });
