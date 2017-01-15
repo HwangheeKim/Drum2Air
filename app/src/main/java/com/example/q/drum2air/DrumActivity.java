@@ -17,12 +17,9 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.media.SoundPool;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -374,10 +371,11 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private int newStateR() {
-        int hMargin = 80;
+        int hMargin = 100;
+        int vMargin = 100;
         switch (state) {
             case 4:
-                if (currentZ - lastZ < -80) {
+                if (currentZ - lastZ < -vMargin) {
                     if (currentY - lastY > hMargin * 2) return 2;
                     return 1;
                 }
@@ -386,7 +384,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                 return 4;
 
             case 2:
-                if (currentZ - lastZ > 80) {
+                if (currentZ - lastZ > vMargin) {
                     if (currentY - lastY < -(hMargin * 2)) return 4;
                     if (currentY - lastY < -hMargin) return 3;
                     return 0;
@@ -395,7 +393,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                 return 2;
 
             case 1:
-                if (currentZ - lastZ > 80) {
+                if (currentZ - lastZ > vMargin) {
                     if (currentY - lastY > hMargin * 2) return 0;
                     if (currentY - lastY > hMargin) return 3;
                     return 4;
@@ -404,7 +402,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                 return 1;
 
             case 3:
-                if (currentZ - lastZ < -80) {
+                if (currentZ - lastZ < -vMargin) {
                     if (currentY - lastY < 0) return 1;
                     return 2;
                 }
@@ -413,7 +411,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                 return 3;
 
             case 0:
-                if (currentZ - lastZ < -80) {
+                if (currentZ - lastZ < -vMargin) {
                     if (currentY - lastY < -(hMargin * 2)) return 1;
                     return 2;
                 }
