@@ -1,6 +1,7 @@
 package com.example.q.drum2air;
 
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -37,7 +38,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DrumActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener{
+public class DrumActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener, SensorEventListener{
 
     private static final int PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
     Music music;
@@ -50,6 +51,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
     Sensor sensorGyroscope;
 
     SoundPool soundPool;
+    SoundAdapter soundBank;
     int[] soundId = new int[6];
 
     double currentX = 0, currentY = 0, currentZ = 0, lastX = 0, lastY = 0, lastZ = 0, prevZ = 0;
@@ -96,18 +98,21 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         button_hand.setOnClickListener(this);
         button_music.setOnClickListener(this);
 
+        button_hihat.setOnLongClickListener(this);
+        button_snare.setOnLongClickListener(this);
+        button_midtom.setOnLongClickListener(this);
+        button_crash.setOnLongClickListener(this);
+        button_floortom.setOnLongClickListener(this);
+        button_bass.setOnLongClickListener(this);
+
         // sensor
         sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         sensorGyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
         // sound effect
         soundPool = new SoundPool(6, AudioManager.STREAM_MUSIC, 0);
-        soundId[0] = soundPool.load(this, R.raw.snare, 1);
-        soundId[1] = soundPool.load(this, R.raw.crash, 1);
-        soundId[2] = soundPool.load(this, R.raw.hihat, 1);
-        soundId[3] = soundPool.load(this, R.raw.midtom, 1);
-        soundId[4] = soundPool.load(this, R.raw.floortom, 1);
-        soundId[5] = soundPool.load(this, R.raw.bass, 1);
+        soundBank = new SoundAdapter(soundPool);
+        initSoundBank();
 
         // Arduino
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
@@ -123,6 +128,23 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         // Music
         music = new Music(this);
         MusicList = music.getAudioList();
+    }
+
+    private void initSoundBank() {
+        soundBank.addSound(soundPool.load(this, R.raw.snare, 1), "Snare");
+        soundBank.addSound(soundPool.load(this, R.raw.crash, 1), "Crash");
+        soundBank.addSound(soundPool.load(this, R.raw.hihat, 1), "Hihat");
+        soundBank.addSound(soundPool.load(this, R.raw.midtom, 1), "Midtom");
+        soundBank.addSound(soundPool.load(this, R.raw.floortom, 1), "Floortom");
+        soundBank.addSound(soundPool.load(this, R.raw.bass, 1), "Bass");
+        // TODO : Add more sounds!
+
+        soundId[0] = soundBank.getSoundId(0);
+        soundId[1] = soundBank.getSoundId(1);
+        soundId[2] = soundBank.getSoundId(2);
+        soundId[3] = soundBank.getSoundId(3);
+        soundId[4] = soundBank.getSoundId(4);
+        soundId[5] = soundBank.getSoundId(5);
     }
 
     private void connectDevice() {
@@ -252,6 +274,44 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 break;
         }
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        FragmentManager fm = getFragmentManager();
+        SoundChooserDialogFragment dialogFragment = new SoundChooserDialogFragment();
+        Bundle args = new Bundle();
+
+        switch(v.getId()) {
+            // TODO : Implement here!
+            case R.id.button_snare:
+                args.putInt("selected", 0);
+                break;
+            case R.id.button_crash:
+                args.putInt("selected", 1);
+                break;
+            case R.id.button_hihat:
+                args.putInt("selected", 2);
+                break;
+            case R.id.button_midtom:
+                args.putInt("selected", 3);
+                break;
+            case R.id.button_floortom:
+                args.putInt("selected", 4);
+                break;
+            case R.id.button_bass:
+                args.putInt("selected", 5);
+                break;
+            default:
+                break;
+        }
+        dialogFragment.setArguments(args);
+        dialogFragment.show(fm, "sound_chooser");
+        return true;
+    }
+
+    public void changeSound(int selected, int to) {
+        soundId[selected] = soundBank.getSoundId(to);
     }
 
     private void initSensor() {
