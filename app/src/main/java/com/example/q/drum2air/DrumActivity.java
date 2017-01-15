@@ -1,10 +1,13 @@
 package com.example.q.drum2air;
 
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -13,8 +16,12 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -26,13 +33,18 @@ import android.widget.Toast;
 import com.felhr.usbserial.UsbSerialDevice;
 import com.felhr.usbserial.UsbSerialInterface;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class DrumActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener{
 
-    Button button_hihat, button_snare, button_midtom, button_crash, button_floortom, button_bass, button_hand;
+    private static final int PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
+    Music music;
+    String[] MusicList;
+    boolean musicPlaying = false;
+
+    Button button_hihat, button_snare, button_midtom, button_crash, button_floortom, button_bass, button_hand, button_music;
 
     SensorManager sensorManager;
     Sensor sensorGyroscope;
@@ -61,6 +73,11 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_drum);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (this.checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+        }
+
         button_hihat = (Button) findViewById(R.id.button_hihat);
         button_snare = (Button) findViewById(R.id.button_snare);
         button_midtom = (Button) findViewById(R.id.button_midtom);
@@ -68,6 +85,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         button_floortom = (Button) findViewById(R.id.button_floortom);
         button_bass = (Button) findViewById(R.id.button_bass);
         button_hand = (Button) findViewById(R.id.button_hand);
+        button_music = (Button) findViewById(R.id.button_music);
 
         button_hihat.setOnClickListener(this);
         button_snare.setOnClickListener(this);
@@ -76,10 +94,13 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         button_floortom.setOnClickListener(this);
         button_bass.setOnClickListener(this);
         button_hand.setOnClickListener(this);
+        button_music.setOnClickListener(this);
 
+        // sensor
         sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         sensorGyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
+        // sound effect
         soundPool = new SoundPool(6, AudioManager.STREAM_MUSIC, 0);
         soundId[0] = soundPool.load(this, R.raw.snare, 1);
         soundId[1] = soundPool.load(this, R.raw.crash, 1);
@@ -88,6 +109,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         soundId[4] = soundPool.load(this, R.raw.floortom, 1);
         soundId[5] = soundPool.load(this, R.raw.bass, 1);
 
+        // Arduino
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         mCallback = new UsbSerialInterface.UsbReadCallback() {
             @Override
@@ -97,6 +119,10 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         };
+
+        // Music
+        music = new Music(this);
+        MusicList = music.getAudioList();
     }
 
     private void connectDevice() {
@@ -195,6 +221,34 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                     button_hand.setText("To left-handed mode");
                     rightHanded = true;
                 }
+                break;
+            case R.id.button_music:
+                if (!musicPlaying) {
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+                    dialog.setTitle("Which music do you wanna play?");
+                    dialog.setItems(MusicList, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            try {
+                                music.playSong(music.AudioPath[which]);
+                            } catch (IllegalArgumentException e) {
+                                e.printStackTrace();
+                            } catch (IllegalStateException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            button_music.setText("Stop music");
+                            musicPlaying = true;
+                        }
+                    });
+                    dialog.show();
+                } else {
+                    music.mediaPlayer.stop();
+                    button_music.setText("Choose music");
+                    musicPlaying = false;
+                }
+                break;
             default:
                 break;
         }

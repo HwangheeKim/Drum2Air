@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/drumset"
-        android:layout_marginTop="15dp">
+        android:layout_marginTop="10dp">
 
         <Button
             android:layout_width="wrap_content"
@@ -86,13 +86,24 @@
         android:textColor="#ffffff"
         android:textSize="20dp"
         android:gravity="center"
-        android:layout_marginTop="15dp"/>
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/button_music"
+        android:text="Choose music"
+        android:textSize="20dp"
+        android:textColor="@color/colorButton2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:background="@android:color/transparent"/>
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/logo"
         android:layout_gravity="center"
-        android:layout_marginTop="60dp"/>
+        android:layout_marginTop="20dp"/>
 
 </LinearLayout>
