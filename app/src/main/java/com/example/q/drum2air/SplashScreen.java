@@ -20,19 +20,19 @@ public class SplashScreen extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.splash);
 
-//        Thread timerThread = new Thread() {
-//            public void run(){
-//                try {
-//                    sleep(10000);
-//                } catch(InterruptedException e) {
-//                    e.printStackTrace();
-//                } finally {
-//                    Intent intent = new Intent(getApplicationContext(), DrumActivity.class);
-//                    startActivity(intent);
-//                }
-//            }
-//        };
-//        timerThread.start();
+        Thread timerThread = new Thread() {
+            public void run(){
+                try {
+                    sleep(3000);
+                } catch(InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    Intent intent = new Intent(getApplicationContext(), DrumActivity.class);
+                    startActivity(intent);
+                }
+            }
+        };
+        timerThread.start();
 
         View view = findViewById(R.id.splash_layout);
         view.setOnTouchListener(new View.OnTouchListener() {
