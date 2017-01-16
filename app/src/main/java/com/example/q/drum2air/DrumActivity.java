@@ -144,7 +144,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                 if (logo) {
                     image_logo.setImageResource(R.drawable.easter);
                     logo = false;
-                    Toast.makeText(getApplicationContext(), "Have a good time with drum2air!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Have a good time with Drum2Air!", Toast.LENGTH_SHORT).show();
                 } else {
                     image_logo.setImageResource(R.drawable.logo);
                     logo = true;
