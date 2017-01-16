@@ -20,18 +20,20 @@ import java.util.ArrayList;
 
 public class SoundAdapter extends BaseAdapter {
     SoundPool soundPool;
+    ArrayList<String> soundSet;
     ArrayList<Integer> soundId;
     ArrayList<String> soundName;
 
     public SoundAdapter(SoundPool soundPool) {
         this.soundPool = soundPool;
+        soundSet = new ArrayList<>();
         soundId = new ArrayList<>();
         soundName = new ArrayList<>();
     }
 
     @Override
     public int getCount() {
-        return soundId.size();
+        return soundSet.size();
     }
 
     @Override
@@ -39,17 +41,13 @@ public class SoundAdapter extends BaseAdapter {
         return new Pair<>(soundId.get(position), soundName.get(position));
     }
 
-    public int getSoundId(int position) {
-        return soundId.get(position);
-    }
-
-    public String getName(int position) {
-        return soundName.get(position);
-    }
-
     @Override
     public long getItemId(int position) {
         return position;
+    }
+
+    public Integer[] getSoundSet(int position) {
+        return soundId.subList(position*6, position*6 + 6).toArray(new Integer[0]);
     }
 
     @Override
@@ -63,16 +61,7 @@ public class SoundAdapter extends BaseAdapter {
         }
 
         TextView soundItemName = (TextView) convertView.findViewById(R.id.sound_item_name);
-        ImageView soundItemPlay = (ImageView) convertView.findViewById(R.id.sound_item_play);
-
-        soundItemName.setText(soundName.get(pos));
-
-        soundItemPlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                soundPool.play(soundId.get(pos), 1.0F, 1.0F, 1, 0, 1.0F);
-            }
-        });
+        soundItemName.setText(soundSet.get(pos));
 
         return convertView;
     }
@@ -82,7 +71,12 @@ public class SoundAdapter extends BaseAdapter {
         soundName.add(name);
     }
 
-    public void clearSound() {
+    public void addSoundSet(String setName) {
+        soundSet.add(setName);
+    }
+
+    public void clearAdapter() {
+        soundSet.clear();
         soundId.clear();
         soundName.clear();
     }

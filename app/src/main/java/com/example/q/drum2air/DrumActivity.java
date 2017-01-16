@@ -52,7 +52,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
 
     SoundPool soundPool;
     SoundAdapter soundBank;
-    int[] soundId = new int[6];
+    Integer[] soundId = new Integer[6];
 
     double currentX = 0, currentY = 0, currentZ = 0, lastX = 0, lastY = 0, lastZ = 0, prevZ = 0;
     int state = 3;
@@ -137,20 +137,25 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initSoundBank() {
+
+        soundBank.addSoundSet("Classic");
         soundBank.addSound(soundPool.load(this, R.raw.snare, 1), "Snare");
         soundBank.addSound(soundPool.load(this, R.raw.crash, 1), "Crash");
         soundBank.addSound(soundPool.load(this, R.raw.hihat, 1), "Hihat");
         soundBank.addSound(soundPool.load(this, R.raw.midtom, 1), "Midtom");
         soundBank.addSound(soundPool.load(this, R.raw.floortom, 1), "Floortom");
         soundBank.addSound(soundPool.load(this, R.raw.bass, 1), "Bass");
+
+        soundBank.addSoundSet("Synth");
+        soundBank.addSound(soundPool.load(this, R.raw.syn_1, 1), "Syn 1");
+        soundBank.addSound(soundPool.load(this, R.raw.syn_2, 1), "Syn 2");
+        soundBank.addSound(soundPool.load(this, R.raw.syn_3, 1), "Syn 3");
+        soundBank.addSound(soundPool.load(this, R.raw.syn_4, 1), "Syn 4");
+        soundBank.addSound(soundPool.load(this, R.raw.syn_5, 1), "Syn 5");
+        soundBank.addSound(soundPool.load(this, R.raw.syn_bass, 1), "Syn Bass");
         // TODO : Add more sounds!
 
-        soundId[0] = soundBank.getSoundId(0);
-        soundId[1] = soundBank.getSoundId(1);
-        soundId[2] = soundBank.getSoundId(2);
-        soundId[3] = soundBank.getSoundId(3);
-        soundId[4] = soundBank.getSoundId(4);
-        soundId[5] = soundBank.getSoundId(5);
+        soundId = soundBank.getSoundSet(0);
     }
 
     private void connectDevice() {
@@ -317,7 +322,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void changeSound(int selected, int to) {
-        soundId[selected] = soundBank.getSoundId(to);
+        soundId = soundBank.getSoundSet(to);
     }
 
     private void initSensor() {
