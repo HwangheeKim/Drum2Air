@@ -20,6 +20,7 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -34,6 +35,8 @@ import com.felhr.usbserial.UsbSerialInterface;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.lang.Math.abs;
 
 public class DrumActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener, SensorEventListener{
 
@@ -56,6 +59,7 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
     boolean first = true;
     boolean swing = false;
     boolean rightHanded = true;
+    float strength = 0;
 
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
     UsbManager usbManager;
@@ -63,6 +67,8 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
     UsbDevice device;
     UsbSerialDevice serialPort;
     UsbSerialInterface.UsbReadCallback mCallback;
+
+    Vibrator v;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +131,9 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
         // Music
         music = new Music(this);
         MusicList = music.getAudioList();
+
+        // Vibrator
+        v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     private void initSoundBank() {
@@ -345,7 +354,23 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     first = false;
                 }
-                soundPool.play(soundId[state], 1.0F, 1.0F, 1, 0, 1.0F);
+
+                Log.d("prevZ&currZ", "prevZ : " + prevZ + ", currZ : " + event.values[2]);
+                if (prevZ - event.values[2] > 2.0) {
+                    strength = 1.0f;
+                } else if (prevZ - event.values[2] > 1.0) {
+                    strength = 0.7f;
+                } else {
+                    strength = 0.4f;
+                }
+
+                Log.d("STATE&STR", "STATE : " + state + ", STRENGTH : " + strength);
+                soundPool.play(soundId[state], strength, strength, 1, 0, 1.0F);
+
+                if (strength == 1.0f && state == 1) {
+                    v.vibrate(500);
+                }
+
                 lastX = currentX;
                 lastY = currentY;
                 lastZ = currentZ;
@@ -361,7 +386,21 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     first = false;
                 }
-                soundPool.play(soundId[state], 1.0F, 1.0F, 1, 0, 1.0F);
+
+                Log.d("prevZ&currZ", "prevZ : " + prevZ + ", currZ : " + event.values[2]);
+                if (prevZ - event.values[2] < -2.0) {
+                    strength = 1.0f;
+                } else if (prevZ - event.values[2] < -1.0) {
+                    strength = 0.7f;
+                } else {
+                    strength = 0.4f;
+                }
+
+                if (strength == 1.0f && state == 1) {
+                    v.vibrate(500);
+                }
+                Log.d("STATE&STR", "STATE : " + state + ", STRENGTH : " + strength);
+                soundPool.play(soundId[state], strength, strength, 1, 0, 1.0F);
                 lastX = currentX;
                 lastY = currentY;
                 lastZ = currentZ;
