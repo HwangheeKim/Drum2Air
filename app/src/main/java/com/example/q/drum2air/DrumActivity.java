@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.felhr.usbserial.UsbSerialDevice;
@@ -36,8 +37,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.lang.Math.abs;
-
 public class DrumActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener, SensorEventListener{
 
     private static final int PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
@@ -46,6 +45,8 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
     boolean musicPlaying = false;
 
     Button button_hihat, button_snare, button_midtom, button_crash, button_floortom, button_bass, button_hand, button_music;
+    ImageView image_logo;
+    boolean logo = true;
 
     SensorManager sensorManager;
     Sensor sensorGyroscope;
@@ -134,6 +135,24 @@ public class DrumActivity extends AppCompatActivity implements View.OnClickListe
 
         // Vibrator
         v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
+
+        // Easter egg
+        image_logo = (ImageView) findViewById(R.id.image_logo);
+        image_logo.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (logo) {
+                    image_logo.setImageResource(R.drawable.easter);
+                    logo = false;
+                    Toast.makeText(getApplicationContext(), "Have a good time with drum2air!", Toast.LENGTH_SHORT).show();
+                } else {
+                    image_logo.setImageResource(R.drawable.logo);
+                    logo = true;
+                    Toast.makeText(getApplicationContext(), "Do you hate us? :(", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            }
+        });
     }
 
     private void initSoundBank() {
